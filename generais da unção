@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Chosen Palette: Warm Harmony (Stone, Amber, Muted Orange) -->
+    <!-- Application Structure Plan: A single-page application designed for exploration and comparison. The structure is thematic, not biographical, to facilitate understanding of core principles. It includes: 1) An introductory header. 2) An "Overview" section with a comparative bar chart of prayer hours, providing an immediate quantitative hook. 3) A tab-based "Explore by Discipline" section (Prayer, Fasting, Word) to analyze themes across all figures. 4) A card-based "Explore by General" section for deep-dives into individual profiles via a modal window. 5) An "Impact" section to visualize the results. 6) A "Conclusion" to summarize and inspire action. This non-linear structure empowers users to explore content based on their interest (a person, a practice, or the overall pattern), enhancing engagement and learning compared to a linear report. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Hours of prayer per day. -> Goal: Compare -> Viz: Interactive Bar Chart (Chart.js) -> Interaction: Hover for tooltips with exact hours and context. -> Justification: Provides the most powerful quantitative comparison in the report, immediately showcasing the extreme dedication.
+        - Report Info: Anecdotes about Prayer, Fasting, and Bible Study. -> Goal: Organize & Inform -> Presentation: Tabbed Interface (HTML/CSS/JS) -> Interaction: Click tabs to switch content. -> Justification: Groups disparate qualitative data into coherent themes, making it easier to synthesize the principles of each discipline.
+        - Report Info: Individual Biographies and detailed habits. -> Goal: Inform (Detailed) -> Presentation: Interactive Cards opening a Modal (HTML/CSS/JS) -> Interaction: Click a general's card to view their full profile. -> Justification: Keeps the main interface clean while providing rich, detailed information on demand.
+        - Report Info: Revivals, conversions, movements. -> Goal: Show Results -> Presentation: Styled Key-Value Grid (HTML/Tailwind) -> Interaction: Static display. -> Justification: Clearly and concisely presents the tangible fruits of their consecration.
+        - All visual elements like icons are made with Unicode characters to avoid graphics files.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Generais da Unção: A Vida Devocional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F4; /* stone-100 */
+            color: #292524; /* stone-800 */
+        }
+        h1, h2, h3 {
+            font-family: 'Lora', serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+                max-height: 500px;
+            }
+        }
+        .modal-backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out;
+        }
+        .nav-link {
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tab-btn.active {
+            border-color: #D97706; /* amber-600 */
+            color: #D97706; /* amber-600 */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-stone-200 shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl md:text-2xl font-bold text-stone-900">🔥 Generais da Unção</h1>
+                </div>
+                <nav class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#overview" class="nav-link text-stone-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium">Visão Geral</a>
+                        <a href="#disciplines" class="nav-link text-stone-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium">Disciplinas</a>
+                        <a href="#generals" class="nav-link text-stone-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium">Generais</a>
+                        <a href="#impact" class="nav-link text-stone-700 hover:text-amber-600 px-3 py-2 rounded-md text-sm font-medium">Impacto</a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <!-- Introduction Section -->
+        <section class="text-center mb-16">
+            <h2 class="text-3xl md:text-5xl font-bold text-amber-700 mb-4">O Padrão da Consagração</h2>
+            <p class="max-w-3xl mx-auto text-stone-600 text-lg">
+                Explore os hábitos espirituais que alimentaram os maiores avivamentos da história. Esta aplicação interativa mapeia a vida devocional dos homens e mulheres que, através de uma consagração radical, foram usados por Deus para transformar o mundo. Descubra os segredos por trás de seu poder e impacto.
+            </p>
+        </section>
+
+        <!-- Overview Section -->
+        <section id="overview" class="mb-20 scroll-mt-20">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-2">Visão Geral Comparativa</h3>
+            <p class="text-center text-stone-600 mb-8 max-w-2xl mx-auto">A dedicação à oração era o pilar central na vida destes generais. O gráfico abaixo visualiza as horas diárias que eles investiam em comunhão com Deus, revelando um padrão de intensidade muito acima do convencional.</p>
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="prayerChart"></canvas>
+                </div>
+                 <p class="text-center text-xs text-stone-500 mt-4">*Valores representam as horas máximas diárias de oração relatadas. "Dia todo" foi estimado em 18 horas para fins de visualização.</p>
+            </div>
+        </section>
+
+        <!-- Disciplines Section -->
+        <section id="disciplines" class="mb-20 scroll-mt-20">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-8">Explorar por Disciplina</h3>
+            <div class="max-w-4xl mx-auto">
+                <div class="border-b border-stone-300 mb-6">
+                    <nav class="-mb-px flex justify-center space-x-4 md:space-x-8" aria-label="Tabs">
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg text-stone-500 hover:text-amber-700 hover:border-amber-700" data-tab="prayer">
+                            🙏 Oração
+                        </button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg text-stone-500 hover:text-amber-700 hover:border-amber-700" data-tab="fasting">
+                            💧 Jejum
+                        </button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg text-stone-500 hover:text-amber-700 hover:border-amber-700" data-tab="word">
+                            📖 Palavra
+                        </button>
+                    </nav>
+                </div>
+                <div id="discipline-content" class="bg-white p-6 rounded-xl shadow-lg min-h-[300px]">
+                    <!-- Content will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Generals Section -->
+        <section id="generals" class="mb-20 scroll-mt-20">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-2">Explorar por General</h3>
+            <p class="text-center text-stone-600 mb-8 max-w-2xl mx-auto">Clique em um perfil para um mergulho profundo na vida, nos hábitos e no legado de cada um desses heróis da fé.</p>
+            <div id="generals-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                <!-- General cards will be injected by JS -->
+            </div>
+        </section>
+
+        <!-- Impact Section -->
+        <section id="impact" class="scroll-mt-20">
+            <h3 class="text-2xl md:text-3xl font-bold text-center mb-8">Impacto e Legado Duradouros</h3>
+            <div id="impact-grid" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Impact cards will be injected by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div id="general-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div id="modal-backdrop" class="fixed inset-0 bg-black/60 modal-backdrop opacity-0"></div>
+        <div id="modal-content" class="modal-content bg-stone-50 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto relative transform scale-95">
+            <div class="sticky top-0 bg-stone-100 p-4 border-b border-stone-200 flex justify-between items-center z-10">
+                <h4 id="modal-title" class="text-2xl font-bold text-amber-700"></h4>
+                <button id="close-modal" class="text-stone-500 hover:text-stone-800 text-3xl">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6">
+                <!-- Modal content will be injected by JS -->
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-stone-200 mt-16">
+        <div class="container mx-auto py-4 px-4 text-center text-stone-600">
+            <p>Aplicação criada para inspirar uma nova geração a buscar uma consagração mais profunda.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const generalsData = [
+                {
+                    id: 'hyde',
+                    name: 'John Hyde',
+                    title: '"O Homem que Orava"',
+                    prayer_hours_max: 18, 
+                    prayer_desc: 'Orava "o dia todo e noite adentro". Passou 30 dias prostrado em oração antes do avivamento de Sialkot. Sua oração era: "Deus, dá-me almas ou eu morro!"',
+                    fasting_desc: 'Jejum era integrado à sua oração, envolvendo abstinência de comida e sono por longos períodos para focar na intercessão por almas.',
+                    word_desc: 'Embora não detalhado, sua vida de oração profunda era fundamentada na Palavra, buscando a vontade de Deus para a salvação de almas.',
+                    impact: 'Catalisador do avivamento de Sialkot; contribuiu para a "maior colheita de almas no Paquistão".',
+                    quote: 'Ó Deus, dá-me almas ou eu morro!',
+                    era: '1865-1912',
+                    image: '🙏'
+                },
+                {
+                    id: 'finney',
+                    name: 'Charles Finney',
+                    title: 'O Advogado do Avivamento',
+                    prayer_hours_max: 8,
+                    prayer_desc: 'Dedicava todo o seu tempo de preparo ao estudo e à oração, em vez de escrever sermões. Contava com intercessores que oravam nas cidades antes de sua chegada.',
+                    fasting_desc: 'Recorria frequentemente ao jejum e à oração para obter "resultados", vendo-o como uma ferramenta estratégica para o poder espiritual.',
+                    word_desc: 'Sua conversão começou com o estudo da Bíblia para refutar citações legais. Ele pregava diretamente da Palavra com poder e convicção.',
+                    impact: 'Mais de 100.000 conversões em 1857-58 com 85% de retenção. Cidades inteiras transformadas. Suas "Palestras sobre Avivamento" são um clássico.',
+                    quote: 'O avivamento não é um milagre, mas o resultado certo do uso correto dos meios.',
+                    era: '1792-1875',
+                    image: '⚖️'
+                },
+                {
+                    id: 'ravenhill',
+                    name: 'Leonard Ravenhill',
+                    title: 'A Consciência da Igreja',
+                    prayer_hours_max: 18,
+                    prayer_desc: 'Orava até 18 horas por dia. Seu objetivo era ser um "homem de oração", não um pregador. A oração era sua vida, não uma parte dela. Tinha uma intimidade com Deus "quase embaraçosa".',
+                    fasting_desc: 'Embora não explicitamente detalhado, sua vida de extrema disciplina sugere que o jejum era uma prática regular para manter a intensidade espiritual.',
+                    word_desc: 'Priorizava a oração sobre o estudo, mas acreditava que a oração iluminava a Palavra. Exortava todos a lerem a Palavra e orar.',
+                    impact: 'Autoridade mundial em avivamento. Sua pregação produzia profunda convicção e arrependimento. Inspirou incontáveis líderes a buscar uma vida de oração mais profunda.',
+                    quote: 'Nenhum homem é maior do que sua vida de oração.',
+                    era: '1907-1994',
+                    image: '🗣️'
+                },
+                 {
+                    id: 'bounds',
+                    name: 'E.M. Bounds',
+                    title: 'O General da Oração',
+                    prayer_hours_max: 4,
+                    prayer_desc: 'Levantava às 4 da manhã para orar por várias horas. Suas orações eram fervorosas, detalhadas e com lágrimas. Na velhice, orava mais e pregava menos.',
+                    fasting_desc: 'Não detalhado nas fontes, mas sua vida de disciplina sugere a prática regular do jejum como suporte à sua intensa vida de oração.',
+                    word_desc: 'Seu profundo entendimento da oração, expresso em seus livros, era claramente nutrido por uma vida imersa nos princípios da Palavra de Deus.',
+                    impact: 'Autor de 11 livros sobre oração, incluindo o clássico "Poder Através da Oração". Impactou inúmeros cristãos a verem a necessidade da oração.',
+                    quote: 'O que a Igreja precisa hoje não é de mais e melhores máquinas... mas de homens que o Espírito Santo possa usar.',
+                    era: '1835-1913',
+                    image: '✍️'
+                },
+                {
+                    id: 'roberts',
+                    name: 'Evan Roberts',
+                    title: 'O Catalisador Galês',
+                    prayer_hours_max: 4,
+                    prayer_desc: 'Orava por 13 anos para ser controlado pelo Espírito. Acordava à 1h da manhã e orava por 4 horas pelo avivamento no País de Gales.',
+                    fasting_desc: 'O foco de sua disciplina estava na oração persistente. O jejum provavelmente era praticado, mas a oração era o hábito destacado.',
+                    word_desc: 'Profundamente devotado à Palavra, lia a Bíblia em cada momento livre, mesmo quando trabalhava nas minas de carvão.',
+                    impact: 'Instrumento principal no Avivamento do País de Gales (1904-1905), que viu mais de 100.000 conversões e desencadeou um movimento de avivamento mundial.',
+                    quote: 'Dobre a Igreja e salve o mundo.',
+                    era: '1878-1951',
+                    image: '🏴󠁧󠁢󠁷󠁬󠁳󠁿'
+                },
+                {
+                    id: 'seymour',
+                    name: 'William Seymour',
+                    title: 'O Líder da Rua Azusa',
+                    prayer_hours_max: 10,
+                    prayer_desc: 'Tornou-se conhecido como um "homem de oração incomum". Orava com a cabeça dentro de uma caixa de madeira, em sinal de humildade.',
+                    fasting_desc: 'Liderou um jejum de dez dias para buscar o batismo no Espírito Santo, que precedeu diretamente o início do Avivamento da Rua Azusa.',
+                    word_desc: 'Estudou na escola bíblica de Charles Parham e pregava ousadamente sobre Atos 2:4, focando nas doutrinas centrais do pentecostalismo.',
+                    impact: 'Iniciou o Avivamento da Rua Azusa (1906), considerado o berço do movimento Pentecostal moderno, que hoje conta com mais de 600 milhões de adeptos.',
+                    quote: 'O poder de Deus nos humilhará e nos manterá humildes.',
+                    era: '1870-1922',
+                    image: '🕊️'
+                },
+                {
+                    id: 'wigglesworth',
+                    name: 'Smith Wigglesworth',
+                    title: 'O Apóstolo da Fé',
+                    prayer_hours_max: 6,
+                    prayer_desc: 'Orava e jejuava frequentemente. Fazia da oração o único critério para companheiros de ministério. Focava no poder do nome de Jesus.',
+                    fasting_desc: 'Jejuava regularmente, incluindo um jejum de duas semanas para se rededicar a Deus. Jejuava aos domingos por conversões.',
+                    word_desc: 'Analfabeto por anos, aprendeu a ler para poder devorar a Palavra. Seus sermões eram "cheios das palavras de Deus".',
+                    impact: 'Ministério marcado por milhares de curas milagrosas documentadas e até ressurreições. Estabeleceu um fundamento para a fé no poder do Espírito Santo.',
+                    quote: 'Temo o dia em que deixaremos de ser chocantes.',
+                    era: '1859-1947',
+                    image: '💪'
+                },
+                {
+                    id: 'kuhlman',
+                    name: 'Kathryn Kuhlman',
+                    title: 'A Serva do Espírito Santo',
+                    prayer_hours_max: 4,
+                    prayer_desc: 'Praticava a "Comunhão Matinal com o Espírito Santo", tratando-O como seu melhor Amigo e Mestre. A intimidade com o Espírito era a chave.',
+                    fasting_desc: 'Ensinava sobre os benefícios espirituais do jejum, indicando que era uma disciplina valorizada e praticada em seu ministério.',
+                    word_desc: 'Defendia a "Leitura da Palavra como Pão Vivo", uma fonte de nutrição espiritual diária e transformação.',
+                    impact: 'Ministério de cura milagrosa que durou meio século, com milhares de curas ocorrendo em sua presença, muitas vezes sem imposição de mãos.',
+                    quote: 'O maior poder que Deus já deu ao homem está no poder da oração.',
+                    era: '1907-1976',
+                    image: '✨'
+                }
+            ];
+
+            const prayerChartCtx = document.getElementById('prayerChart').getContext('2d');
+            let prayerChart;
+
+            function createPrayerChart() {
+                const labels = generalsData.map(g => g.name);
+                const data = generalsData.map(g => g.prayer_hours_max);
+
+                if (prayerChart) {
+                    prayerChart.destroy();
+                }
+
+                prayerChart = new Chart(prayerChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Horas Máximas de Oração por Dia',
+                            data: data,
+                            backgroundColor: 'rgba(217, 119, 6, 0.6)', // amber-600 com opacidade
+                            borderColor: 'rgba(217, 119, 6, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Horas por Dia'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 90,
+                                    minRotation: 45
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label;
+                                    },
+                                    label: function(context) {
+                                        const general = generalsData.find(g => g.name === context.label);
+                                        return `Até ${context.raw} horas. ${general.prayer_desc.substring(0, 50)}...`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const disciplineContentEl = document.getElementById('discipline-content');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+
+            function renderDisciplineContent(discipline) {
+                let content = `<h4 class="text-xl font-bold mb-4 text-amber-800 capitalize">${discipline === 'word' ? 'Palavra' : discipline}</h4>`;
+                content += '<div class="space-y-4">';
+                generalsData.forEach(general => {
+                    const key = discipline === 'word' ? 'word_desc' : `${discipline}_desc`;
+                    if (general[key]) {
+                        content += `
+                            <div class="p-3 bg-stone-100 rounded-lg">
+                                <p class="font-semibold text-stone-800">${general.name}</p>
+                                <p class="text-stone-600 text-sm">${general[key]}</p>
+                            </div>
+                        `;
+                    }
+                });
+                content += '</div>';
+                disciplineContentEl.innerHTML = content;
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderDisciplineContent(button.dataset.tab);
+                });
+            });
+
+            const generalsGridEl = document.getElementById('generals-grid');
+            function renderGeneralCards() {
+                let content = '';
+                generalsData.forEach(general => {
+                    content += `
+                        <div class="general-card cursor-pointer bg-white rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all p-4 text-center" data-id="${general.id}">
+                            <div class="text-4xl mb-2">${general.image}</div>
+                            <h5 class="font-bold text-sm text-stone-800">${general.name}</h5>
+                            <p class="text-xs text-stone-500">${general.era}</p>
+                        </div>
+                    `;
+                });
+                generalsGridEl.innerHTML = content;
+            }
+
+            const modal = document.getElementById('general-modal');
+            const modalBackdrop = document.getElementById('modal-backdrop');
+            const modalContent = document.getElementById('modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const closeModalBtn = document.getElementById('close-modal');
+
+            function openModal(general) {
+                modalTitle.textContent = general.name;
+                modalBody.innerHTML = `
+                    <p class="text-stone-600 italic mb-4">${general.title}</p>
+                    <div class="mb-4">
+                        <h5 class="font-bold text-amber-700">🙏 Oração (${general.prayer_hours_max}h max/dia)</h5>
+                        <p class="text-stone-700">${general.prayer_desc}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h5 class="font-bold text-amber-700">💧 Jejum</h5>
+                        <p class="text-stone-700">${general.fasting_desc}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h5 class="font-bold text-amber-700">📖 Palavra</h5>
+                        <p class="text-stone-700">${general.word_desc}</p>
+                    </div>
+                    <div class="mb-4">
+                        <h5 class="font-bold text-amber-700">🌍 Impacto</h5>
+                        <p class="text-stone-700">${general.impact}</p>
+                    </div>
+                    <blockquote class="border-l-4 border-amber-500 pl-4 py-2 bg-amber-50 rounded-r-lg mt-6">
+                        <p class="text-stone-700 italic">"${general.quote}"</p>
+                    </blockquote>
+                `;
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                  modalBackdrop.classList.remove('opacity-0');
+                  modalContent.classList.remove('scale-95');
+                }, 10);
+            }
+
+            function closeModal() {
+                modalBackdrop.classList.add('opacity-0');
+                modalContent.classList.add('scale-95');
+                setTimeout(() => {
+                  modal.classList.add('hidden');
+                }, 300);
+            }
+
+            generalsGridEl.addEventListener('click', (e) => {
+                const card = e.target.closest('.general-card');
+                if (card) {
+                    const general = generalsData.find(g => g.id === card.dataset.id);
+                    openModal(general);
+                }
+            });
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', closeModal);
+
+            const impactGridEl = document.getElementById('impact-grid');
+            function renderImpactGrid() {
+                 const impactHighlights = [
+                    {
+                        title: 'Avivamento do País de Gales',
+                        figure: 'Evan Roberts',
+                        stat: '+100.000',
+                        desc: 'Conversões em menos de um ano, iniciando um movimento global.'
+                    },
+                    {
+                        title: 'Movimento Pentecostal Moderno',
+                        figure: 'William Seymour',
+                        stat: '+600 Milhões',
+                        desc: 'De adeptos hoje traçam sua origem ao Avivamento da Rua Azusa.'
+                    },
+                    {
+                        title: 'O Grande Despertar',
+                        figure: 'Charles Finney & outros',
+                        stat: 'Nações Transformadas',
+                        desc: 'Comunidades inteiras foram limpas, com prisões esvaziadas por anos.'
+                    },
+                     {
+                        title: 'Ministérios de Cura em Massa',
+                        figure: 'Wigglesworth, Kuhlman',
+                        stat: 'Milhares de Milagres',
+                        desc: 'Demonstrações públicas do poder de Deus que fortaleceram a fé de multidões.'
+                    }
+                ];
+
+                let content = '';
+                impactHighlights.forEach(item => {
+                    content += `
+                        <div class="bg-white p-6 rounded-xl shadow-lg">
+                            <h4 class="font-bold text-xl text-amber-800">${item.title}</h4>
+                            <p class="text-sm text-stone-500 mb-2">Principalmente associado a ${item.figure}</p>
+                            <p class="text-4xl font-bold text-stone-800 my-2">${item.stat}</p>
+                            <p class="text-stone-600">${item.desc}</p>
+                        </div>
+                    `;
+                });
+                impactGridEl.innerHTML = content;
+            }
+
+
+            function smoothScroll() {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                           targetElement.scrollIntoView({
+                                behavior: 'smooth'
+                           });
+                        }
+                    });
+                });
+            }
+
+
+            function init() {
+                createPrayerChart();
+                document.querySelector('.tab-btn[data-tab="prayer"]').click();
+                renderGeneralCards();
+                renderImpactGrid();
+                smoothScroll();
+            }
+
+            init();
+        });
+    </script>
+</body>
+</html>
